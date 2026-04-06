@@ -58,7 +58,7 @@ const MyProfile = ({ userInfo }: MyProfileProps) => {
         }
     };
 
-    const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setError(null);
         setSuccess(null);
