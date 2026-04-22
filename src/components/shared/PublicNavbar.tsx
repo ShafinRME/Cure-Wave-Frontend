@@ -2,9 +2,12 @@ import { getDefaultDashboardRoute } from "@/lib/auth-utils";
 import { getUserInfo } from "@/services/auth/getUserInfo";
 import { getCookie } from "@/services/auth/tokenHandlers";
 import Link from "next/link";
+import Image from "next/image"; // Add this import
 import AISearchDialog from "./AISSearchDialog";
 import MobileMenu from "./MobileMenu";
 import NavbarAuthButtons from "./NavbarAuthButtons";
+
+import logoImg from "../../assets/images/logo1.png";
 
 const PublicNavbar = async () => {
   const navItems = [
@@ -22,10 +25,17 @@ const PublicNavbar = async () => {
     : "/";
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur  dark:bg-background/95">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur dark:bg-background/95">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link href="/" className="flex items-center space-x-2">
-          <span className="text-xl font-bold text-primary">PH Doc</span>
+          <Image
+            src={logoImg}
+            alt="Logo"
+            width={120} // Adjust based on your logo size
+            height={40}  // Adjust based on your logo size
+            priority
+            className="h-auto w-auto"
+          />
         </Link>
 
         <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
@@ -50,7 +60,6 @@ const PublicNavbar = async () => {
           />
         </div>
 
-        {/* Mobile Menu */}
         <MobileMenu
           navItems={navItems}
           hasAccessToken={!!accessToken}
