@@ -24,14 +24,14 @@ const DashboardSidebarContent = ({
 }: DashboardSidebarContentProps) => {
     const pathname = usePathname();
     return (
-        <div className="hidden md:flex h-full w-64 flex-col border-r bg-card">
+        <div className="hidden md:flex h-screen w-64 flex-col border-r bg-card">
             {/* Logo/Brand */}
-            <div className="flex h-16 items-center border-b px-6">
+            <div className="flex h-16 items-center border-b px-6 shrink-0">
                 <Logo href={dashboardHome} width={110} height={45} />
             </div>
 
             {/* Navigation */}
-            <ScrollArea className="flex-1 px-3 py-4">
+            <ScrollArea className="h-[calc(100vh-8rem)] px-3 py-4">
                 <nav className="space-y-6">
                     {navItems.map((section, sectionIdx) => (
                         <div key={sectionIdx}>
@@ -79,7 +79,7 @@ const DashboardSidebarContent = ({
             </ScrollArea>
 
             {/* User Info at Bottom */}
-            <div className="border-t p-4">
+            <div className="border-t p-4 shrink-0">
                 <div className="flex items-center gap-3">
                     <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
                         <span className="text-sm font-semibold text-primary">
