@@ -1,71 +1,179 @@
-import { useEffect, useState } from 'react';
-import { ArrowRight, Loader2 } from 'lucide-react';
+"use client";
+import { useEffect, useState } from "react";
+import { ArrowRight, Loader2, Stethoscope } from "lucide-react";
 
 interface Specialty {
   id: string;
   title: string;
   icon: string;
-  createdAt?: string;
-  updatedAt?: string;
 }
 
-// Soft accent colors cycling through specialties
-const ACCENT_PALETTE = [
-  { bg: '#FFF0F0', border: '#FFD6D6', accent: '#E85454', light: '#FEE2E2' },
-  { bg: '#EEF4FF', border: '#C7D7FB', accent: '#3B6EF8', light: '#DBEAFE' },
-  { bg: '#F3F0FF', border: '#D3C8FC', accent: '#7C3AED', light: '#EDE9FE' },
-  { bg: '#F0FDF4', border: '#C3EED0', accent: '#16A34A', light: '#DCFCE7' },
-  { bg: '#FFFBEB', border: '#FDE68A', accent: '#D97706', light: '#FEF3C7' },
-  { bg: '#FFF0FB', border: '#F9C8F0', accent: '#C026D3', light: '#FAE8FF' },
+const CARD_ACCENTS = [
+  { tint: "rgba(99,102,241,0.07)",  ring: "rgba(99,102,241,0.3)",  dot: "#6366f1" },
+  { tint: "rgba(20,184,166,0.07)",  ring: "rgba(20,184,166,0.3)",  dot: "#14b8a6" },
+  { tint: "rgba(236,72,153,0.07)",  ring: "rgba(236,72,153,0.3)",  dot: "#ec4899" },
+  { tint: "rgba(245,158,11,0.07)",  ring: "rgba(245,158,11,0.3)",  dot: "#f59e0b" },
+  { tint: "rgba(34,197,94,0.07)",   ring: "rgba(34,197,94,0.3)",   dot: "#22c55e" },
+  { tint: "rgba(239,68,68,0.07)",   ring: "rgba(239,68,68,0.3)",   dot: "#ef4444" },
+  { tint: "rgba(168,85,247,0.07)",  ring: "rgba(168,85,247,0.3)",  dot: "#a855f7" },
+  { tint: "rgba(59,130,246,0.07)",  ring: "rgba(59,130,246,0.3)",  dot: "#3b82f6" },
 ];
 
-const SpecialtyCard = ({
-  specialty,
-  index,
-}: {
-  specialty: Specialty;
-  index: number;
-}) => {
-  const colors = ACCENT_PALETTE[index % ACCENT_PALETTE.length];
+const SpecialtyCard = ({ specialty, index }: { specialty: Specialty; index: number }) => {
+  const accent = CARD_ACCENTS[index % CARD_ACCENTS.length];
+  const [hovered, setHovered] = useState(false);
 
   return (
     <div
-      className="specialty-card"
-      style={
-        {
-          '--card-bg': colors.bg,
-          '--card-border': colors.border,
-          '--card-accent': colors.accent,
-          '--card-light': colors.light,
-        } as React.CSSProperties
-      }
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        position: "relative",
+        overflow: "hidden",
+        borderRadius: "var(--radius-xl)",
+        background: hovered ? accent.tint : "var(--card)",
+        border: `1.5px solid ${hovered ? accent.ring : "var(--border)"}`,
+        padding: "28px 20px 24px",
+        cursor: "pointer",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        textAlign: "center",
+        transition:
+          "transform 0.28s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s ease, background 0.25s ease, border-color 0.25s ease",
+        transform: hovered ? "translateY(-5px)" : "translateY(0)",
+        boxShadow: hovered
+          ? `0 16px 40px -12px ${accent.ring}`
+          : "0 1px 4px rgba(0,0,0,0.04)",
+      }}
     >
       {/* Decorative blobs */}
-      <span className="blob blob-1" />
-      <span className="blob blob-2" />
+      <span
+        style={{
+          position: "absolute", top: -28, right: -28,
+          width: 80, height: 80, borderRadius: "50%",
+          background: accent.dot,
+          opacity: hovered ? 0.12 : 0.05,
+          transition: "opacity 0.3s ease, transform 0.4s ease",
+          transform: hovered ? "scale(1.5)" : "scale(1)",
+          pointerEvents: "none",
+        }}
+      />
+      <span
+        style={{
+          position: "absolute", bottom: -20, left: -20,
+          width: 52, height: 52, borderRadius: "50%",
+          background: accent.dot,
+          opacity: hovered ? 0.08 : 0.03,
+          transition: "opacity 0.3s ease, transform 0.4s ease",
+          transform: hovered ? "scale(1.6)" : "scale(1)",
+          pointerEvents: "none",
+        }}
+      />
 
-      {/* Icon */}
-      <div className="icon-wrapper">
+      {/* Icon wrapper — always white so image is always visible */}
+      <div
+        style={{
+          width: 68, height: 68,
+          borderRadius: "var(--radius-lg)",
+          background: "#ffffff",
+          border: `1.5px solid ${hovered ? accent.ring : "var(--border)"}`,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          marginBottom: 16,
+          boxShadow: hovered
+            ? `0 6px 20px -4px ${accent.ring}`
+            : "0 2px 8px rgba(0,0,0,0.06)",
+          transition:
+            "transform 0.28s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s ease, border-color 0.25s ease",
+          transform: hovered ? "scale(1.08) rotate(-3deg)" : "scale(1)",
+          flexShrink: 0,
+          position: "relative",
+          zIndex: 1,
+        }}
+      >
         <img
           src={specialty.icon}
           alt={specialty.title}
-          className="specialty-img"
+          style={{ width: 38, height: 38, objectFit: "contain", display: "block" }}
           onError={(e) => {
-            (e.target as HTMLImageElement).style.display = 'none';
+            const img = e.target as HTMLImageElement;
+            img.style.display = "none";
+            const fb = img.nextElementSibling as HTMLElement;
+            if (fb) fb.style.display = "flex";
           }}
         />
+        <span
+          style={{ display: "none", alignItems: "center", justifyContent: "center", color: accent.dot }}
+        >
+          <Stethoscope size={28} />
+        </span>
       </div>
 
-      {/* Content */}
-      <h3 className="card-title">{specialty.title}</h3>
-      <span className="card-cta">
-        Book now <ArrowRight size={13} strokeWidth={2.5} />
-      </span>
+      {/* Title */}
+      <h3
+        style={{
+          fontSize: 14, fontWeight: 600,
+          color: "var(--card-foreground)",
+          margin: "0 0 4px", lineHeight: 1.3,
+          position: "relative", zIndex: 1,
+        }}
+      >
+        {specialty.title}
+      </h3>
+
+      {/* Accent dot */}
+      <span
+        style={{
+          display: "inline-block",
+          width: 6, height: 6, borderRadius: "50%",
+          background: accent.dot,
+          marginTop: 8,
+          opacity: hovered ? 1 : 0.35,
+          transition: "opacity 0.2s ease, transform 0.2s ease",
+          transform: hovered ? "scale(1.5)" : "scale(1)",
+          position: "relative", zIndex: 1,
+        }}
+      />
     </div>
   );
 };
 
-const Specialities = () => {
+function ViewAllLink() {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <a
+      href="/specialties"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        display: "inline-flex", alignItems: "center", gap: 6,
+        fontSize: 13, fontWeight: 600, textDecoration: "none",
+        padding: "9px 18px", borderRadius: 9999,
+        border: `1.5px solid ${hovered ? "var(--primary)" : "var(--ring)"}`,
+        background: hovered ? "var(--primary)" : "var(--accent)",
+        color: hovered ? "var(--primary-foreground)" : "var(--primary)",
+        transition: "background 0.18s ease, color 0.18s ease, border-color 0.18s ease",
+      }}
+    >
+      View All <ArrowRight size={14} strokeWidth={2.5} />
+    </a>
+  );
+}
+
+function CenteredState({ children, color = "var(--muted-foreground)" }: { children: React.ReactNode; color?: string }) {
+  return (
+    <div
+      style={{
+        display: "flex", alignItems: "center", justifyContent: "center",
+        minHeight: 200, gap: 8, color, fontSize: 14,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+export default function Specialities() {
   const [specialties, setSpecialties] = useState<Specialty[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -73,17 +181,14 @@ const Specialities = () => {
   useEffect(() => {
     const fetchSpecialties = async () => {
       try {
-        setLoading(true);
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/specialties?limit=8`
         );
-        if (!res.ok) throw new Error('Failed to fetch specialties');
+        if (!res.ok) throw new Error("Failed to fetch specialties");
         const json = await res.json();
-        // Support both { data: [...] } and direct array responses
-        setSpecialties(Array.isArray(json) ? json : json.data ?? []);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (err: any) {
-        setError(err.message ?? 'Something went wrong');
+        setSpecialties(Array.isArray(json) ? json : (json.data ?? []));
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Something went wrong");
       } finally {
         setLoading(false);
       }
@@ -92,264 +197,87 @@ const Specialities = () => {
   }, []);
 
   return (
-    <>
-      {/* ── Scoped styles ─────────────────────────────── */}
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=DM+Sans:wght@400;500&display=swap');
+    <section style={{ padding: "80px 0 96px", background: "var(--background)" }}>
+      <div style={{ maxWidth: 1180, margin: "0 auto", padding: "0 24px" }}>
 
-        .spec-section {
-          padding: 80px 0 100px;
-          background: #f8f9fc;
-          font-family: 'DM Sans', sans-serif;
-        }
-
-        .spec-inner {
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 0 24px;
-        }
-
-        /* Header */
-        .spec-header {
-          display: flex;
-          align-items: flex-end;
-          justify-content: space-between;
-          margin-bottom: 52px;
-          gap: 16px;
-          flex-wrap: wrap;
-        }
-
-        .spec-eyebrow {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          font-size: 12px;
-          font-weight: 600;
-          letter-spacing: 0.12em;
-          text-transform: uppercase;
-          color: #6366f1;
-          margin-bottom: 10px;
-        }
-
-        .spec-eyebrow-dot {
-          width: 6px;
-          height: 6px;
-          border-radius: 50%;
-          background: #6366f1;
-        }
-
-        .spec-title {
-          font-family: 'Sora', sans-serif;
-          font-size: clamp(26px, 3vw, 38px);
-          font-weight: 700;
-          color: #0f172a;
-          line-height: 1.2;
-          margin: 0;
-        }
-
-        .spec-subtitle {
-          margin: 8px 0 0;
-          font-size: 15px;
-          color: #64748b;
-          max-width: 460px;
-        }
-
-        .spec-view-all {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          font-size: 14px;
-          font-weight: 600;
-          color: #6366f1;
-          text-decoration: none;
-          white-space: nowrap;
-          padding: 10px 20px;
-          border: 1.5px solid #c7d2fe;
-          border-radius: 100px;
-          transition: background 0.2s, color 0.2s, border-color 0.2s;
-        }
-
-        .spec-view-all:hover {
-          background: #6366f1;
-          color: #fff;
-          border-color: #6366f1;
-        }
-
-        /* Grid */
-        .spec-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-          gap: 20px;
-        }
-
-        /* Card */
-        .specialty-card {
-          position: relative;
-          overflow: hidden;
-          border-radius: 20px;
-          background: var(--card-bg);
-          border: 1.5px solid var(--card-border);
-          padding: 32px 24px 28px;
-          cursor: pointer;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          text-align: center;
-          gap: 0;
-          transition: transform 0.28s cubic-bezier(0.34,1.56,0.64,1),
-                      box-shadow 0.25s ease,
-                      border-color 0.25s ease;
-        }
-
-        .specialty-card:hover {
-          transform: translateY(-6px);
-          box-shadow: 0 20px 40px -12px color-mix(in srgb, var(--card-accent) 30%, transparent);
-          border-color: var(--card-accent);
-        }
-
-        /* Decorative blobs — purely visual, don't interfere with content */
-        .blob {
-          position: absolute;
-          border-radius: 50%;
-          background: var(--card-accent);
-          opacity: 0.07;
-          pointer-events: none;
-          transition: transform 0.5s ease, opacity 0.5s ease;
-        }
-        .blob-1 { width: 120px; height: 120px; right: -40px; top: -40px; }
-        .blob-2 { width: 80px; height: 80px; left: -30px; bottom: -30px; }
-        .specialty-card:hover .blob { opacity: 0.13; transform: scale(1.3); }
-
-        /* Icon wrapper — stays the same solid tinted bg on hover */
-        .icon-wrapper {
-          width: 76px;
-          height: 76px;
-          border-radius: 18px;
-          background: #fff;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin-bottom: 20px;
-          box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-          transition: transform 0.28s cubic-bezier(0.34,1.56,0.64,1),
-                      box-shadow 0.25s ease;
-          flex-shrink: 0;
-          position: relative;
-          z-index: 1;
-        }
-
-        .specialty-card:hover .icon-wrapper {
-          transform: scale(1.1) rotate(-4deg);
-          box-shadow: 0 8px 24px color-mix(in srgb, var(--card-accent) 25%, transparent);
-        }
-
-        /* Image stays fully visible on hover — no color change */
-        .specialty-img {
-          width: 42px;
-          height: 42px;
-          object-fit: contain;
-        }
-
-        /* Title */
-        .card-title {
-          font-family: 'Sora', sans-serif;
-          font-size: 16px;
-          font-weight: 700;
-          color: #0f172a;
-          margin: 0 0 8px;
-          position: relative;
-          z-index: 1;
-          line-height: 1.3;
-        }
-
-        /* CTA pill */
-        .card-cta {
-          display: inline-flex;
-          align-items: center;
-          gap: 4px;
-          font-size: 12px;
-          font-weight: 600;
-          color: var(--card-accent);
-          background: color-mix(in srgb, var(--card-accent) 10%, transparent);
-          padding: 4px 12px;
-          border-radius: 100px;
-          margin-top: 6px;
-          position: relative;
-          z-index: 1;
-          opacity: 0;
-          transform: translateY(6px);
-          transition: opacity 0.22s ease, transform 0.22s ease;
-        }
-
-        .specialty-card:hover .card-cta {
-          opacity: 1;
-          transform: translateY(0);
-        }
-
-        /* States */
-        .spec-loading, .spec-error {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          min-height: 220px;
-          gap: 10px;
-          font-size: 15px;
-          color: #64748b;
-        }
-
-        .spec-error { color: #ef4444; }
-
-        @media (max-width: 640px) {
-          .spec-header { flex-direction: column; align-items: flex-start; }
-          .spec-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
-          .specialty-card { padding: 24px 16px 20px; }
-          .icon-wrapper { width: 62px; height: 62px; }
-          .specialty-img { width: 34px; height: 34px; }
-        }
-      `}</style>
-
-      {/* ── Section ───────────────────────────────────── */}
-      <section className="spec-section">
-        <div className="spec-inner">
-          {/* Header */}
-          <div className="spec-header">
-            <div>
-              <div className="spec-eyebrow">
-                <span className="spec-eyebrow-dot" />
-                Medical Expertise
-              </div>
-              <h2 className="spec-title">Our Specialities</h2>
-              <p className="spec-subtitle">
-                Access top-rated medical experts across all major specialities
-                with years of clinical experience.
-              </p>
+        {/* Header */}
+        <div
+          style={{
+            display: "flex", alignItems: "flex-end",
+            justifyContent: "space-between",
+            marginBottom: 48, gap: 16, flexWrap: "wrap",
+          }}
+        >
+          <div>
+            <div
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 8,
+                fontSize: 11, fontWeight: 600,
+                letterSpacing: "0.1em", textTransform: "uppercase",
+                color: "var(--primary)", marginBottom: 10,
+              }}
+            >
+              <span
+                style={{
+                  width: 20, height: 2, borderRadius: 2,
+                  background: "var(--primary)", display: "inline-block",
+                }}
+              />
+              Our Expertise
             </div>
-            <a href="/specialties" className="spec-view-all">
-              View All <ArrowRight size={14} />
-            </a>
+            <h2
+              style={{
+                fontSize: "clamp(24px, 3vw, 34px)", fontWeight: 700,
+                color: "var(--foreground)", margin: 0, lineHeight: 1.2,
+              }}
+            >
+              Medical Specialities
+            </h2>
+            <p
+              style={{
+                margin: "8px 0 0", fontSize: 14,
+                color: "var(--muted-foreground)", maxWidth: 420, lineHeight: 1.65,
+              }}
+            >
+              Access top-rated experts across all major specialities with years of clinical experience.
+            </p>
           </div>
-
-          {/* Content */}
-          {loading ? (
-            <div className="spec-loading">
-              <Loader2 size={20} className="animate-spin" />
-              Loading specialities…
-            </div>
-          ) : error ? (
-            <div className="spec-error">⚠ {error}</div>
-          ) : specialties.length === 0 ? (
-            <div className="spec-loading">No specialities found.</div>
-          ) : (
-            <div className="spec-grid">
-              {specialties.map((s, i) => (
-                <SpecialtyCard key={s.id} specialty={s} index={i} />
-              ))}
-            </div>
-          )}
+          <ViewAllLink />
         </div>
-      </section>
-    </>
-  );
-};
 
-export default Specialities;
+        {/* Grid / States */}
+        {loading ? (
+          <CenteredState>
+            <Loader2 size={18} style={{ animation: "spin 1s linear infinite", flexShrink: 0 }} />
+            Loading specialities…
+            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+          </CenteredState>
+        ) : error ? (
+          <CenteredState color="var(--destructive)">⚠ {error}</CenteredState>
+        ) : specialties.length === 0 ? (
+          <CenteredState>No specialities found.</CenteredState>
+        ) : (
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(195px, 1fr))",
+              gap: 16,
+            }}
+          >
+            {specialties.map((s, i) => (
+              <SpecialtyCard key={s.id} specialty={s} index={i} />
+            ))}
+          </div>
+        )}
+
+        {/* Divider */}
+        <div
+          style={{
+            marginTop: 64, height: 1,
+            background: "linear-gradient(to right, transparent, var(--border), transparent)",
+          }}
+        />
+      </div>
+    </section>
+  );
+}
