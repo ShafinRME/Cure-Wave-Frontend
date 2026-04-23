@@ -1,5 +1,6 @@
 "use client";
 import { Calendar, Search, Star } from "lucide-react";
+import Link from "next/link";
 
 export function Hero() {
   return (
@@ -32,12 +33,16 @@ export function Hero() {
 
           {/* CTAs */}
           <div className="flex flex-wrap gap-3 mb-10">
-            <button className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors">
-              <Calendar size={15} /> Book appointment
-            </button>
-            <button className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg border text-sm font-medium hover:bg-muted transition-colors">
-              <Search size={15} /> Browse doctors
-            </button>
+            <Link href={"/consultation"}>
+              <button className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors">
+                <Calendar size={15} /> Book appointment
+              </button>
+            </Link>
+            <Link href={"/doctor"}>
+              <button className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg border text-sm font-medium hover:bg-muted transition-colors">
+                <Search size={15} /> Browse doctors
+              </button>
+            </Link>
           </div>
 
           {/* Stats */}
