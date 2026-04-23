@@ -10,16 +10,16 @@ import Link from "next/link";
 // ── Server-side fetch (no useEffect needed — this is a Server Component) ──────
 async function getTopRatedDoctors(): Promise<IDoctor[]> {
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_API_URL}/doctors?limit=3&sortBy=averageRating&sortOrder=desc`,
-      {
-        next: { revalidate: 300 }, // ISR: refresh every 5 minutes
-      }
-    );
+    const url = `${process.env.NEXT_PUBLIC_BASE_API_URL}/doctors?limit=3&sortBy=averageRating&sortOrder=desc`;
+    console.log("Fetching doctors from:", url); // ← check this in terminal
+    const res = await fetch(url, { next: { revalidate: 300 } });
+    console.log("Response status:", res.status); // ← check this too
     if (!res.ok) return [];
     const json = await res.json();
+    console.log("Doctors data:", json); // ← see what comes back
     return json?.data ?? [];
-  } catch {
+  } catch (err) {
+    console.error("Fetch error:", err);
     return [];
   }
 }
