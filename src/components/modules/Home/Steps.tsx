@@ -3,54 +3,61 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
-const steps = [
+type ColorVariant = 'blue' | 'pink' | 'green' | 'yellow' | 'purple' | 'indigo' | 'orange' | 'red';
+
+const steps: Array<{
+  icon: React.ElementType;
+  title: string;
+  description: string;
+  color: ColorVariant;
+}> = [
   { 
     icon: Search, 
     title: 'Search Doctor', 
     description: 'Find your doctor easily with a minimum of effort.',
-    color: 'blue'
+    color: 'blue' as const
   },
   { 
     icon: ClipboardList, 
     title: 'Check Doctor Profile', 
     description: 'Get to know your doctor better.',
-    color: 'pink'
+    color: 'pink' as const
   },
   { 
     icon: CalendarCheck, 
     title: 'Schedule Appointment', 
     description: 'Choose the time and date that suits you.',
-    color: 'green'
+    color: 'green' as const
   },
   { 
     icon: ShieldCheck, 
     title: 'Get Your Solution', 
     description: 'Our doctors are here to help you.',
-    color: 'yellow'
+    color: 'yellow' as const
   },
   { 
     icon: FileText, 
     title: 'Electronic prescription', 
     description: 'Get your prescription instantly.',
-    color: 'purple'
+    color: 'purple' as const
   },
   { 
     icon: Video, 
     title: 'Instant video consultation', 
     description: 'Consult with your doctor from anywhere.',
-    color: 'indigo'
+    color: 'indigo' as const
   },
   { 
     icon: CreditCard, 
     title: 'Easy payment options', 
     description: 'Pay with ease using various methods.',
-    color: 'orange'
+    color: 'orange' as const
   },
   { 
     icon: HeartPulse, 
     title: 'Health recovery', 
     description: 'Start your journey to better health.',
-    color: 'red'
+    color: 'red' as const
   },
 ];
 
@@ -116,7 +123,7 @@ const StepCard = ({
   title: string;
   description: string;
   index: number;
-  color: keyof typeof colorVariants;
+  color: ColorVariant;
 }) => {
   const variant = colorVariants[color];
   
